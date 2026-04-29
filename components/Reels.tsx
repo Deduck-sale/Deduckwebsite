@@ -165,9 +165,13 @@ export default function Reels({ reels }: Props) {
         target.offsetLeft - container.offsetWidth / 2 + target.offsetWidth / 2;
       container.scrollTo({ left: scrollPos, behavior: "smooth" });
     } else {
-      setLightbox(reel.image_url);
+      // Prefer external video URL (YouTube/Vimeo/mp4) — fall back to thumbnail image.
+      setLightbox(reel.video_url || reel.image_url);
     }
   };
+
+  const isVideoFile = (url: string) =>
+    /\.(mp4|webm|mov|m4v)(\?.*)?$/i.test(url);
 
   if (reels.length === 0) return null;
 
@@ -212,14 +216,35 @@ export default function Reels({ reels }: Props) {
             }`}
             onClick={(e) => handleClick(reel, e)}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={reel.image_url}
-              alt={reel.caption}
-              className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition duration-500"
-              loading="lazy"
-            />
+            {isVideoFile(reel.image_url) ? (
+              <video
+                src={reel.image_url}
+                muted
+                loop
+                playsInline
+                preload="metadata"
+                className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition duration-500"
+              />
+            ) : (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={reel.image_url}
+                alt={reel.caption}
+                className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition duration-500"
+                loading="lazy"
+              />
+            )}
             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-black/10 pointer-events-none" />
+
+            {reel.video_url && (
+              <div className="absolute top-3 left-3 z-20 pointer-events-none">
+                <div className="w-9 h-9 rounded-full bg-deduck-yellow/90 flex items-center justify-center shadow-lg">
+                  <svg className="w-4 h-4 text-deduck-dark ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </div>
+              </div>
+            )}
 
             <div className="absolute right-3 bottom-8 flex flex-col items-center space-y-5 z-20 pointer-events-none">
               <div className="flex flex-col items-center">

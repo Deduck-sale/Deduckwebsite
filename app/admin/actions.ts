@@ -139,6 +139,7 @@ export async function saveReel(formData: FormData) {
     caption: formData.get("caption") as string,
     audio_text: formData.get("audio_text") as string,
     image_url: imageUrl,
+    video_url: ((formData.get("video_url") as string) || "").trim() || null,
     views: Number(formData.get("views") || 0),
     likes: Number(formData.get("likes") || 0),
     shares: Number(formData.get("shares") || 0),

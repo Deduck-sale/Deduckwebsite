@@ -27,6 +27,7 @@ export interface Reel {
   caption: string;
   audio_text: string;
   image_url: string;
+  video_url: string | null;
   views: number;
   likes: number;
   shares: number;

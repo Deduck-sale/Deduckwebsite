@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { detectEmbed } from "@/lib/embed";
 
 interface Props {
   src: string | null;
@@ -23,7 +24,7 @@ export default function Lightbox({ src, onClose }: Props) {
 
   if (!src) return null;
 
-  const isVideo = /\.(mp4|webm|mov)(\?.*)?$/i.test(src);
+  const embed = detectEmbed(src);
 
   return (
     <div
@@ -31,7 +32,7 @@ export default function Lightbox({ src, onClose }: Props) {
       onClick={onClose}
     >
       <button
-        className="absolute top-6 right-6 text-white hover:text-deduck-yellow transition p-2 bg-white/10 rounded-full border border-white/20 backdrop-blur-md"
+        className="absolute top-6 right-6 text-white hover:text-deduck-yellow transition p-2 bg-white/10 rounded-full border border-white/20 backdrop-blur-md z-10"
         onClick={onClose}
         aria-label="Close"
       >
@@ -49,9 +50,24 @@ export default function Lightbox({ src, onClose }: Props) {
           />
         </svg>
       </button>
-      {isVideo ? (
+
+      {embed.type === "youtube" || embed.type === "vimeo" ? (
+        <div
+          // 9:16 aspect for shorts/reels — iframe fills it
+          className="aspect-[9/16] h-[90vh] max-w-full rounded-2xl overflow-hidden shadow-2xl border border-white/20 bg-black"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <iframe
+            src={embed.src}
+            title="Embedded video"
+            className="w-full h-full"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+          />
+        </div>
+      ) : embed.type === "video" ? (
         <video
-          src={src}
+          src={embed.src}
           controls
           autoPlay
           className="max-h-[90vh] max-w-full rounded-2xl shadow-2xl object-contain border border-white/20"
@@ -60,7 +76,7 @@ export default function Lightbox({ src, onClose }: Props) {
       ) : (
         // eslint-disable-next-line @next/next/no-img-element
         <img
-          src={src}
+          src={embed.src}
           alt="Portfolio Fullscreen"
           className="max-h-[90vh] max-w-full rounded-2xl shadow-2xl object-contain border border-white/20"
           onClick={(e) => e.stopPropagation()}

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import type { Reel } from "@/lib/supabase/types";
 import { saveReel } from "../actions";
 import { uploadToStorage } from "@/lib/supabase/upload";
+import { getYouTubeThumbnail } from "@/lib/embed";
 
 interface Props {
   reel?: Reel;
@@ -16,9 +17,23 @@ export default function ReelForm({ reel }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
   const [preview, setPreview] = useState<string | null>(reel?.image_url ?? null);
+  const [thumbnailUrl, setThumbnailUrl] = useState<string>(reel?.image_url ?? "");
+  const [videoUrl, setVideoUrl] = useState<string>(reel?.video_url ?? "");
   const [isVideo, setIsVideo] = useState(
     reel?.image_url ? /\.(mp4|webm|mov)(\?.*)?$/i.test(reel.image_url) : false
   );
+
+  function autoFillThumbnail() {
+    const thumb = getYouTubeThumbnail(videoUrl);
+    if (!thumb) {
+      setError("ดึง thumbnail ได้เฉพาะลิงก์ YouTube — กรอก URL Thumbnail เองสำหรับ Vimeo / mp4");
+      return;
+    }
+    setError(null);
+    setThumbnailUrl(thumb);
+    setPreview(thumb);
+    setIsVideo(false);
+  }
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -76,11 +91,59 @@ export default function ReelForm({ reel }: Props) {
   return (
     <form onSubmit={onSubmit} className="glass-card p-8 space-y-5 max-w-2xl">
       {reel && <input type="hidden" name="id" value={reel.id} />}
-      <input type="hidden" name="image_url" value={reel?.image_url ?? ""} />
+      <input type="hidden" name="image_url" value={thumbnailUrl} />
 
+      {/* === A: Video URL (YouTube/Vimeo/mp4) === */}
+      <div className="border border-white/10 rounded-xl p-4 space-y-3 bg-white/[0.02]">
+        <div>
+          <label className="block text-sm text-gray-300 mb-1 font-medium">
+            🎥 วิธีที่ 1 — ใส่ลิงก์วิดีโอ <span className="text-xs text-gray-500">(แนะนำ: ใช้ YouTube Shorts / Vimeo / .mp4)</span>
+          </label>
+          <div className="flex gap-2">
+            <input
+              type="url"
+              name="video_url"
+              value={videoUrl}
+              onChange={(e) => setVideoUrl(e.target.value)}
+              className="form-input flex-1"
+              placeholder="https://youtube.com/shorts/... หรือ https://youtu.be/..."
+            />
+            <button
+              type="button"
+              onClick={autoFillThumbnail}
+              className="px-4 py-2 bg-deduck-yellow/20 border border-deduck-yellow/40 rounded-lg text-deduck-yellow text-sm hover:bg-deduck-yellow/30 transition whitespace-nowrap"
+              title="ดึงรูป thumbnail จาก YouTube อัตโนมัติ"
+            >
+              🪄 ดึง Thumbnail
+            </button>
+          </div>
+          <p className="text-xs text-gray-500 mt-1">
+            รองรับ YouTube (รวม Shorts), Vimeo, ลิงก์ .mp4 / .webm
+          </p>
+        </div>
+      </div>
+
+      {/* === B: Direct upload === */}
+      <div className="border border-white/10 rounded-xl p-4 space-y-3 bg-white/[0.02]">
+        <label className="block text-sm text-gray-300 mb-1 font-medium">
+          📤 วิธีที่ 2 — อัปโหลดไฟล์เอง
+        </label>
+        <input
+          type="file"
+          name="file"
+          accept="image/*,video/mp4,video/webm,video/quicktime"
+          onChange={onFile}
+          className="form-input file:mr-4 file:py-1.5 file:px-3 file:rounded file:border-0 file:bg-deduck-yellow file:text-deduck-dark file:font-bold file:text-sm"
+        />
+        <p className="text-xs text-gray-500">
+          รองรับ MP4, WebM, MOV หรือ JPG, PNG (สูงสุด 50MB) — ใช้เฉพาะถ้าไม่มีลิงก์ YouTube
+        </p>
+      </div>
+
+      {/* === Thumbnail preview & manual override === */}
       <div>
         <label className="block text-sm text-gray-300 mb-2">
-          วิดีโอ หรือ รูปภาพ (แนะนำสัดส่วน 9:16)
+          รูป Thumbnail บนการ์ด (สัดส่วน 9:16)
         </label>
         {preview && (
           <div className="w-full max-w-[200px] aspect-[9/16] rounded-xl overflow-hidden mb-3 border border-white/10 bg-black">
@@ -98,21 +161,25 @@ export default function ReelForm({ reel }: Props) {
                 src={preview}
                 alt="preview"
                 className="w-full h-full object-cover"
+                onError={() => setPreview(null)}
               />
             )}
           </div>
         )}
         <input
-          type="file"
-          name="file"
-          accept="image/*,video/mp4,video/webm,video/quicktime"
-          onChange={onFile}
-          className="form-input file:mr-4 file:py-1.5 file:px-3 file:rounded file:border-0 file:bg-deduck-yellow file:text-deduck-dark file:font-bold file:text-sm"
+          type="url"
+          value={thumbnailUrl}
+          onChange={(e) => {
+            setThumbnailUrl(e.target.value);
+            setPreview(e.target.value || null);
+            setIsVideo(false);
+          }}
+          className="form-input"
+          placeholder="URL รูป — หรือคลิก '🪄 ดึง Thumbnail' ด้านบน"
         />
         <p className="text-xs text-gray-500 mt-1">
-          {reel
-            ? "เลือกไฟล์ใหม่หากต้องการเปลี่ยน (ไม่บังคับ)"
-            : "รองรับ MP4, WebM, MOV หรือ JPG, PNG (สูงสุด 50MB)"}
+          ถ้าใช้ "วิธีที่ 1" → กดปุ่ม 🪄 เพื่อดึงรูปจาก YouTube ใส่ให้อัตโนมัติ
+          • ถ้าใช้ "วิธีที่ 2" → ระบบจะใช้ไฟล์ที่อัปโหลดเป็น thumbnail เอง
         </p>
       </div>
 

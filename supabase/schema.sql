@@ -36,7 +36,8 @@ create table if not exists public.reels (
   id uuid primary key default gen_random_uuid(),
   caption text not null,
   audio_text text not null default 'Original Audio - De Duck Agency',
-  image_url text not null,
+  image_url text not null,                  -- thumbnail (รูปบนการ์ด)
+  video_url text,                           -- optional: YouTube / Vimeo / direct mp4 — เล่นใน lightbox
   views integer not null default 0,
   likes integer not null default 0,
   shares integer not null default 0,
