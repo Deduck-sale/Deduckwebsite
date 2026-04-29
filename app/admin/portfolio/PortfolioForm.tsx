@@ -112,8 +112,8 @@ export default function PortfolioForm({ item }: Props) {
         >
           <option value="beverage">เครื่องดื่ม (Beverage)</option>
           <option value="food">อาหาร (Food)</option>
-          <option value="product">สินค้า (Product)</option>
-          <option value="graphic">กราฟิก (Graphic & Ads)</option>
+          <option value="product">อสังหา (Real Estate)</option>
+          <option value="graphic">งานสัมมนา (Event)</option>
         </select>
       </div>
 

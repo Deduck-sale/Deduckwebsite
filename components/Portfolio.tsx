@@ -8,8 +8,8 @@ const filters: { key: PortfolioCategory | "all"; label: string }[] = [
   { key: "all", label: "ทั้งหมด (All)" },
   { key: "beverage", label: "เครื่องดื่ม (Beverage)" },
   { key: "food", label: "อาหาร (Food)" },
-  { key: "product", label: "สินค้า (Products)" },
-  { key: "graphic", label: "กราฟิก (Graphic & Ads)" },
+  { key: "product", label: "อสังหา (Real Estate)" },
+  { key: "graphic", label: "งานสัมมนา (Event)" },
 ];
 
 interface Props {

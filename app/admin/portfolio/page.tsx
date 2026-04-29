@@ -7,8 +7,8 @@ import { deletePortfolio } from "../actions";
 const CATEGORY_LABELS: Record<string, string> = {
   beverage: "เครื่องดื่ม",
   food: "อาหาร",
-  product: "สินค้า",
-  graphic: "กราฟิก",
+  product: "อสังหา",
+  graphic: "งานสัมมนา",
 };
 
 export default async function PortfolioAdminPage() {
