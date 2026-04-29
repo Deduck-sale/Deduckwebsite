@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import type { Reel } from "@/lib/supabase/types";
 import { saveReel } from "../actions";
+import { uploadToStorage } from "@/lib/supabase/upload";
 
 interface Props {
   reel?: Reel;
@@ -13,27 +14,53 @@ export default function ReelForm({ reel }: Props) {
   const router = useRouter();
   const [pending, start] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [status, setStatus] = useState<string | null>(null);
   const [preview, setPreview] = useState<string | null>(reel?.image_url ?? null);
   const [isVideo, setIsVideo] = useState(
     reel?.image_url ? /\.(mp4|webm|mov)(\?.*)?$/i.test(reel.image_url) : false
   );
 
-  function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget);
+    const form = e.currentTarget;
+    const formData = new FormData(form);
     const file = formData.get("file") as File;
-    const imageUrl = formData.get("image_url") as string;
+    let imageUrl = formData.get("image_url") as string;
+
     if (!reel && (!file || file.size === 0) && !imageUrl) {
       setError("กรุณาเลือกไฟล์ หรือใส่ URL");
       return;
     }
     setError(null);
+
+    // Upload directly from browser to Supabase Storage if a new file is selected,
+    // then send only the resulting URL to the server action.
+    if (file && file.size > 0) {
+      try {
+        setStatus(
+          `กำลังอัปโหลด ${(file.size / 1024 / 1024).toFixed(1)}MB ...`
+        );
+        imageUrl = await uploadToStorage(file, "reels");
+        formData.set("image_url", imageUrl);
+        formData.delete("file");
+      } catch (err) {
+        setStatus(null);
+        setError(
+          "อัปโหลดไฟล์ไม่สำเร็จ: " +
+            (err instanceof Error ? err.message : String(err))
+        );
+        return;
+      }
+    }
+
+    setStatus("กำลังบันทึก...");
     start(async () => {
       try {
         await saveReel(formData);
         router.push("/admin/reels");
         router.refresh();
       } catch (err) {
+        setStatus(null);
         setError(err instanceof Error ? err.message : "เกิดข้อผิดพลาด");
       }
     });
@@ -85,7 +112,7 @@ export default function ReelForm({ reel }: Props) {
         <p className="text-xs text-gray-500 mt-1">
           {reel
             ? "เลือกไฟล์ใหม่หากต้องการเปลี่ยน (ไม่บังคับ)"
-            : "รองรับ MP4, WebM, MOV หรือ JPG, PNG"}
+            : "รองรับ MP4, WebM, MOV หรือ JPG, PNG (สูงสุด 50MB)"}
         </p>
       </div>
 
@@ -170,13 +197,19 @@ export default function ReelForm({ reel }: Props) {
         </div>
       )}
 
+      {status && !error && (
+        <div className="text-deduck-yellow text-sm bg-deduck-yellow/10 border border-deduck-yellow/20 rounded-lg px-4 py-2">
+          {status}
+        </div>
+      )}
+
       <div className="flex gap-3 pt-2">
         <button
           type="submit"
-          disabled={pending}
+          disabled={pending || status !== null}
           className="px-6 py-3 bg-deduck-yellow text-deduck-dark font-bold rounded-lg hover:bg-yellow-400 transition disabled:opacity-50"
         >
-          {pending ? "กำลังบันทึก..." : "บันทึก"}
+          {status ?? "บันทึก"}
         </button>
         <button
           type="button"

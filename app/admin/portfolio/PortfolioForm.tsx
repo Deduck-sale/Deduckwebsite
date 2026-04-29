@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import type { PortfolioItem } from "@/lib/supabase/types";
 import { savePortfolio } from "../actions";
+import { uploadToStorage } from "@/lib/supabase/upload";
 
 interface Props {
   item?: PortfolioItem;
@@ -13,24 +14,47 @@ export default function PortfolioForm({ item }: Props) {
   const router = useRouter();
   const [pending, start] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [status, setStatus] = useState<string | null>(null);
   const [preview, setPreview] = useState<string | null>(item?.image_url ?? null);
 
-  function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const file = formData.get("file") as File;
-    const imageUrl = formData.get("image_url") as string;
+    let imageUrl = formData.get("image_url") as string;
+
     if (!item && (!file || file.size === 0) && !imageUrl) {
       setError("กรุณาเลือกรูปภาพ หรือใส่ URL");
       return;
     }
     setError(null);
+
+    if (file && file.size > 0) {
+      try {
+        setStatus(
+          `กำลังอัปโหลด ${(file.size / 1024 / 1024).toFixed(1)}MB ...`
+        );
+        imageUrl = await uploadToStorage(file, "portfolio");
+        formData.set("image_url", imageUrl);
+        formData.delete("file");
+      } catch (err) {
+        setStatus(null);
+        setError(
+          "อัปโหลดไฟล์ไม่สำเร็จ: " +
+            (err instanceof Error ? err.message : String(err))
+        );
+        return;
+      }
+    }
+
+    setStatus("กำลังบันทึก...");
     start(async () => {
       try {
         await savePortfolio(formData);
         router.push("/admin/portfolio");
         router.refresh();
       } catch (err) {
+        setStatus(null);
         setError(err instanceof Error ? err.message : "เกิดข้อผิดพลาด");
       }
     });
@@ -122,13 +146,19 @@ export default function PortfolioForm({ item }: Props) {
         </div>
       )}
 
+      {status && !error && (
+        <div className="text-deduck-yellow text-sm bg-deduck-yellow/10 border border-deduck-yellow/20 rounded-lg px-4 py-2">
+          {status}
+        </div>
+      )}
+
       <div className="flex gap-3 pt-2">
         <button
           type="submit"
-          disabled={pending}
+          disabled={pending || status !== null}
           className="px-6 py-3 bg-deduck-yellow text-deduck-dark font-bold rounded-lg hover:bg-yellow-400 transition disabled:opacity-50"
         >
-          {pending ? "กำลังบันทึก..." : "บันทึก"}
+          {status ?? "บันทึก"}
         </button>
         <button
           type="button"
