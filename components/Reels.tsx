@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Lightbox from "./Lightbox";
 import type { Reel } from "@/lib/supabase/types";
+import { useTranslation } from "@/lib/i18n/LanguageContext";
 
 interface Props {
   reels: Reel[];
@@ -25,6 +26,7 @@ function formatNumber(num: number): string {
 }
 
 export default function Reels({ reels }: Props) {
+  const { t } = useTranslation();
   const containerRef = useRef<HTMLDivElement>(null);
   const [activeKey, setActiveKey] = useState<string | null>(null);
   const [lightbox, setLightbox] = useState<string | null>(null);
@@ -183,15 +185,15 @@ export default function Reels({ reels }: Props) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6 text-center md:text-left flex flex-col md:flex-row justify-between items-end">
         <div>
           <span className="glass-panel text-deduck-yellow px-6 py-2 text-sm font-medium tracking-widest uppercase shadow-lg">
-            Shorts &amp; Reels
+            {t.reels.eyebrow}
           </span>
           <h2 className="text-3xl md:text-4xl font-bold text-white mt-6 drop-shadow-md">
-            ผลงานวิดีโอแนวตั้ง
+            {t.reels.title}
           </h2>
         </div>
         <p className="text-gray-400 mt-4 md:mt-0 max-w-sm text-sm font-light">
-          <span className="hidden md:inline">เลื่อนซ้าย-ขวา เพื่อ</span>
-          รับชมผลงานตัดต่อวิดีโอสั้นสำหรับ Social Media ของเรา
+          <span className="hidden md:inline">{t.reels.description_prefix}</span>
+          {t.reels.description}
         </p>
       </div>
 

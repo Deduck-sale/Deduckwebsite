@@ -1,4 +1,9 @@
+"use client";
+
+import { useTranslation } from "@/lib/i18n/LanguageContext";
+
 export default function Footer() {
+  const { t } = useTranslation();
   return (
     <footer
       id="contact"
@@ -15,15 +20,15 @@ export default function Footer() {
               UCK
             </div>
             <p className="text-gray-300 max-w-xs font-light">
-              Digital Marketing Agency
+              {t.footer.tagline_top}
               <br />
-              ทีมงานพร้อม บริการด้วยใจ เก็บทุกความทรงจำ
+              {t.footer.tagline_bottom}
             </p>
           </div>
 
           <div className="text-center md:text-right">
             <h4 className="text-white font-semibold text-lg mb-4 tracking-wide">
-              ติดต่อเรา (Contact Us)
+              {t.footer.heading}
             </h4>
             <div className="flex flex-col items-center md:items-end space-y-4">
               <a
@@ -80,11 +85,11 @@ export default function Footer() {
         </div>
 
         <div className="mt-12 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center text-sm text-gray-500">
-          <p>&copy; {new Date().getFullYear()} Deduck Agency Co.,Ltd. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Deduck Agency Co.,Ltd. {t.footer.copyright}</p>
           <p className="mt-2 md:mt-0 font-light">
-            Enhance{" "}
+            {t.footer.enhance}{" "}
             <span className="text-deduck-yellow font-bold tracking-wider">
-              YOUR BUSINESS
+              {t.footer.enhance_yellow}
             </span>
           </p>
         </div>

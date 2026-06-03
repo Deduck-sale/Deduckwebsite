@@ -1,17 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
-const links = [
-  { href: "#home", label: "หน้าแรก" },
-  { href: "#services", label: "บริการของเรา" },
-  { href: "#portfolio", label: "ผลงานทั้งหมด" },
-  { href: "#pricing", label: "รายละเอียดราคา" },
-];
+import { useTranslation } from "@/lib/i18n/LanguageContext";
+import LanguageToggle from "./LanguageToggle";
 
 export default function Navbar() {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+
+  const links = [
+    { href: "#home", label: t.nav.home },
+    { href: "#services", label: t.nav.services },
+    { href: "#portfolio", label: t.nav.portfolio },
+    { href: "#pricing", label: t.nav.pricing },
+  ];
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 50);
@@ -64,8 +67,9 @@ export default function Navbar() {
               href="#contact"
               className="px-5 py-2 bg-deduck-yellow text-deduck-dark font-bold rounded-full hover:bg-yellow-400 transition transform hover:scale-105 shadow-[0_0_15px_rgba(255,208,0,0.3)]"
             >
-              ติดต่อเรา
+              {t.nav.contact}
             </a>
+            <LanguageToggle />
           </nav>
 
           <div className="md:hidden flex items-center">
@@ -110,8 +114,11 @@ export default function Navbar() {
               onClick={() => setOpen(false)}
               className="block px-3 py-2 mt-4 text-base font-bold text-deduck-dark bg-deduck-yellow rounded-md text-center"
             >
-              ติดต่อเรา
+              {t.nav.contact}
             </a>
+            <div className="flex justify-center pt-3">
+              <LanguageToggle variant="mobile" />
+            </div>
           </div>
         </div>
       )}

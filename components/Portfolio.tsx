@@ -3,20 +3,21 @@
 import { useState } from "react";
 import Lightbox from "./Lightbox";
 import type { PortfolioCategory, PortfolioItem } from "@/lib/supabase/types";
-
-const filters: { key: PortfolioCategory | "all"; label: string }[] = [
-  { key: "all", label: "ทั้งหมด (All)" },
-  { key: "beverage", label: "เครื่องดื่ม (Beverage)" },
-  { key: "food", label: "อาหาร (Food)" },
-  { key: "product", label: "อสังหา (Real Estate)" },
-  { key: "graphic", label: "งานสัมมนา (Event)" },
-];
+import { useTranslation } from "@/lib/i18n/LanguageContext";
 
 interface Props {
   items: PortfolioItem[];
 }
 
 export default function Portfolio({ items }: Props) {
+  const { t } = useTranslation();
+  const filters: { key: PortfolioCategory | "all"; label: string }[] = [
+    { key: "all", label: t.portfolio.filters.all },
+    { key: "beverage", label: t.portfolio.filters.beverage },
+    { key: "food", label: t.portfolio.filters.food },
+    { key: "product", label: t.portfolio.filters.product },
+    { key: "graphic", label: t.portfolio.filters.graphic },
+  ];
   const [active, setActive] = useState<PortfolioCategory | "all">("all");
   const [lightbox, setLightbox] = useState<string | null>(null);
 
@@ -24,14 +25,13 @@ export default function Portfolio({ items }: Props) {
     <section id="portfolio" className="py-24 relative">
       <div className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center mb-10">
         <span className="glass-panel text-deduck-yellow px-6 py-2 text-sm font-medium tracking-widest uppercase">
-          PORTFOLIO
+          {t.portfolio.eyebrow}
         </span>
         <h2 className="text-3xl md:text-5xl font-bold text-white mt-6 mb-4 drop-shadow-md">
-          ผลงานทั้งหมด
+          {t.portfolio.title}
         </h2>
         <p className="text-gray-400 max-w-2xl mx-auto text-lg">
-          รวมผลงานคุณภาพจาก De Duck Agency ทั้งงานถ่ายภาพ เครื่องดื่ม อาหาร
-          สินค้า และกราฟิกดีไซน์
+          {t.portfolio.subtitle}
         </p>
       </div>
 
@@ -70,7 +70,7 @@ export default function Portfolio({ items }: Props) {
               />
               <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition duration-300 flex items-center justify-center">
                 <span className="text-white font-bold tracking-wider uppercase border border-white/50 bg-white/10 backdrop-blur-md px-6 py-3 rounded-full">
-                  View Project
+                  {t.portfolio.view_project}
                 </span>
               </div>
             </div>

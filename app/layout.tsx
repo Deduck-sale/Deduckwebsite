@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Prompt } from "next/font/google";
 import "./globals.css";
 import JsonLd from "@/components/JsonLd";
+import { LanguageProvider } from "@/lib/i18n/LanguageContext";
 
 const prompt = Prompt({
   subsets: ["thai", "latin"],
@@ -74,7 +75,7 @@ export default function RootLayout({
     <html lang="th" className={`scroll-smooth ${prompt.variable}`}>
       <body className="antialiased font-sans flex flex-col min-h-screen">
         <JsonLd />
-        {children}
+        <LanguageProvider>{children}</LanguageProvider>
       </body>
     </html>
   );
