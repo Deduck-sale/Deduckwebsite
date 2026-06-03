@@ -2,15 +2,43 @@
 
 import type { Package } from "@/lib/supabase/types";
 import { useTranslation } from "@/lib/i18n/LanguageContext";
-import type { Messages } from "@/lib/i18n/messages";
+import type { Locale, Messages } from "@/lib/i18n/messages";
 
 interface Props {
   marketing: Package[];
   production: Package[];
 }
 
-function PackageCard({ pkg, t }: { pkg: Package; t: Messages }) {
+/**
+ * Pick a localized field if available, otherwise fall back to the Thai source.
+ * - For strings: returns the EN value when locale === "en" AND a non-empty
+ *   value exists.
+ * - For arrays: returns the EN array only if it has at least one entry.
+ */
+function localizeStr(locale: Locale, th: string, en: string | null | undefined): string {
+  if (locale === "en" && en && en.trim().length > 0) return en;
+  return th;
+}
+
+function localizeArr(locale: Locale, th: string[], en: string[] | null | undefined): string[] {
+  if (locale === "en" && en && en.length > 0) return en;
+  return th;
+}
+
+function PackageCard({
+  pkg,
+  t,
+  locale,
+}: {
+  pkg: Package;
+  t: Messages;
+  locale: Locale;
+}) {
   const isRecommended = pkg.is_recommended;
+  const name = localizeStr(locale, pkg.name, pkg.name_en);
+  const features = localizeArr(locale, pkg.features, pkg.features_en);
+  const channels = localizeArr(locale, pkg.channels, pkg.channels_en);
+
   return (
     <div
       className={`glass-card flex flex-col overflow-hidden relative ${
@@ -30,7 +58,7 @@ function PackageCard({ pkg, t }: { pkg: Package; t: Messages }) {
         } border-b py-5 text-center backdrop-blur-md`}
       >
         <h3 className="text-white font-bold text-2xl tracking-wide whitespace-pre-line">
-          {pkg.name}
+          {name}
         </h3>
       </div>
       <div className="p-8 flex-grow">
@@ -38,20 +66,20 @@ function PackageCard({ pkg, t }: { pkg: Package; t: Messages }) {
           {t.pricing.details}
         </div>
         <ul className="space-y-3 text-gray-300 mb-8 font-light">
-          {pkg.features.map((f, i) => (
+          {features.map((f, i) => (
             <li key={i} className="flex items-start">
               <span className="text-deduck-yellow mr-3 font-bold">✓</span>
               {f}
             </li>
           ))}
         </ul>
-        {pkg.channels.length > 0 && (
+        {channels.length > 0 && (
           <>
             <div className="inline-block glass-panel text-deduck-yellow font-medium px-4 py-1 text-sm mb-6 border-deduck-yellow/30">
               {t.pricing.channels}
             </div>
             <ul className="space-y-3 text-gray-300 font-light">
-              {pkg.channels.map((c, i) => (
+              {channels.map((c, i) => (
                 <li key={i} className="flex items-start">
                   <span className="text-white/50 mr-3">•</span>
                   {c}
@@ -74,7 +102,7 @@ function PackageCard({ pkg, t }: { pkg: Package; t: Messages }) {
 }
 
 export default function Pricing({ marketing, production }: Props) {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   return (
     <section id="pricing" className="py-24 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -90,7 +118,7 @@ export default function Pricing({ marketing, production }: Props) {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {marketing.map((p) => (
-            <PackageCard key={p.id} pkg={p} t={t} />
+            <PackageCard key={p.id} pkg={p} t={t} locale={locale} />
           ))}
         </div>
 
@@ -109,7 +137,7 @@ export default function Pricing({ marketing, production }: Props) {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
               {production.map((p) => (
-                <PackageCard key={p.id} pkg={p} t={t} />
+                <PackageCard key={p.id} pkg={p} t={t} locale={locale} />
               ))}
             </div>
           </div>

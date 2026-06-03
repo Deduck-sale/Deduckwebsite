@@ -45,16 +45,27 @@ export default function PackageForm({ pkg }: Props) {
         </select>
       </Field>
 
-      <Field label="ชื่อ Package">
-        <input
-          type="text"
-          name="name"
-          defaultValue={pkg?.name ?? ""}
-          className="form-input"
-          placeholder="เช่น Marketing Standard"
-          required
-        />
-      </Field>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Field label="🇹🇭 ชื่อ Package (TH)">
+          <input
+            type="text"
+            name="name"
+            defaultValue={pkg?.name ?? ""}
+            className="form-input"
+            placeholder="เช่น Marketing Standard"
+            required
+          />
+        </Field>
+        <Field label="🇬🇧 ชื่อ Package (EN) — ไม่บังคับ">
+          <input
+            type="text"
+            name="name_en"
+            defaultValue={pkg?.name_en ?? ""}
+            className="form-input"
+            placeholder="e.g. Marketing Standard"
+          />
+        </Field>
+      </div>
 
       <Field label="ราคา (บาท)">
         <input
@@ -67,25 +78,43 @@ export default function PackageForm({ pkg }: Props) {
         />
       </Field>
 
-      <Field
-        label="รายละเอียด Service (ขึ้นบรรทัดใหม่ = 1 ข้อ)"
-      >
-        <textarea
-          name="features"
-          defaultValue={pkg?.features.join("\n") ?? ""}
-          className="form-input min-h-[140px]"
-          placeholder={"4 Video Clips + Caption\n10 Social Media Post\n..."}
-        />
-      </Field>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Field label="🇹🇭 รายละเอียด Service (TH) — บรรทัดใหม่ = 1 ข้อ">
+          <textarea
+            name="features"
+            defaultValue={pkg?.features.join("\n") ?? ""}
+            className="form-input min-h-[140px]"
+            placeholder={"4 Video Clips + Caption\n10 Social Media Post\n..."}
+          />
+        </Field>
+        <Field label="🇬🇧 What's included (EN) — บรรทัดใหม่ = 1 ข้อ">
+          <textarea
+            name="features_en"
+            defaultValue={pkg?.features_en?.join("\n") ?? ""}
+            className="form-input min-h-[140px]"
+            placeholder={"4 Video Clips + Caption\n10 Social Media Posts\n..."}
+          />
+        </Field>
+      </div>
 
-      <Field label="ช่องทางการดูแล (ขึ้นบรรทัดใหม่ = 1 ข้อ)">
-        <textarea
-          name="channels"
-          defaultValue={pkg?.channels.join("\n") ?? ""}
-          className="form-input min-h-[80px]"
-          placeholder={"Facebook, IG, Tiktok\nบริการดูแล Ads"}
-        />
-      </Field>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Field label="🇹🇭 ช่องทางการดูแล (TH) — บรรทัดใหม่ = 1 ข้อ">
+          <textarea
+            name="channels"
+            defaultValue={pkg?.channels.join("\n") ?? ""}
+            className="form-input min-h-[80px]"
+            placeholder={"Facebook, IG, Tiktok\nบริการดูแล Ads"}
+          />
+        </Field>
+        <Field label="🇬🇧 Channels covered (EN) — บรรทัดใหม่ = 1 ข้อ">
+          <textarea
+            name="channels_en"
+            defaultValue={pkg?.channels_en?.join("\n") ?? ""}
+            className="form-input min-h-[80px]"
+            placeholder={"Facebook, IG, Tiktok\nAds management"}
+          />
+        </Field>
+      </div>
 
       <div className="grid grid-cols-2 gap-4">
         <Field label="ลำดับการแสดง">

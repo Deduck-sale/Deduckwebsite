@@ -4,10 +4,13 @@ export interface Package {
   id: string;
   section: "marketing" | "production";
   name: string;
+  name_en: string | null;
   subtitle: string | null;
   price: number;
   features: string[];
+  features_en: string[];
   channels: string[];
+  channels_en: string[];
   is_recommended: boolean;
   sort_order: number;
   is_active: boolean;

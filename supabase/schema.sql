@@ -7,11 +7,14 @@
 create table if not exists public.packages (
   id uuid primary key default gen_random_uuid(),
   section text not null check (section in ('marketing','production')),
-  name text not null,
+  name text not null,                       -- ชื่อภาษาไทย (default)
+  name_en text,                             -- ชื่อภาษาอังกฤษ (optional — fallback to name)
   subtitle text,
   price integer not null default 0,
-  features text[] not null default '{}',
+  features text[] not null default '{}',    -- features ภาษาไทย
+  features_en text[] not null default '{}', -- features ภาษาอังกฤษ (optional)
   channels text[] not null default '{}',
+  channels_en text[] not null default '{}',
   is_recommended boolean not null default false,
   sort_order integer not null default 0,
   is_active boolean not null default true,

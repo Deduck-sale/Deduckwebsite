@@ -23,19 +23,22 @@ export async function savePackage(formData: FormData) {
   const supabase = await requireAuth();
 
   const id = formData.get("id") as string | null;
+  const splitLines = (value: FormDataEntryValue | null) =>
+    ((value as string) || "")
+      .split("\n")
+      .map((s) => s.trim())
+      .filter(Boolean);
+
   const data = {
     section: formData.get("section") as "marketing" | "production",
     name: formData.get("name") as string,
+    name_en: ((formData.get("name_en") as string) || "").trim() || null,
     subtitle: (formData.get("subtitle") as string) || null,
     price: Number(formData.get("price")),
-    features: (formData.get("features") as string)
-      .split("\n")
-      .map((s) => s.trim())
-      .filter(Boolean),
-    channels: (formData.get("channels") as string)
-      .split("\n")
-      .map((s) => s.trim())
-      .filter(Boolean),
+    features: splitLines(formData.get("features")),
+    features_en: splitLines(formData.get("features_en")),
+    channels: splitLines(formData.get("channels")),
+    channels_en: splitLines(formData.get("channels_en")),
     is_recommended: formData.get("is_recommended") === "on",
     sort_order: Number(formData.get("sort_order") || 0),
     is_active: formData.get("is_active") === "on",
