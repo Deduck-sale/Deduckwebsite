@@ -11,6 +11,8 @@ export interface Package {
   features_en: string[];
   channels: string[];
   channels_en: string[];
+  best_fit: string | null;
+  best_fit_en: string | null;
   is_recommended: boolean;
   sort_order: number;
   is_active: boolean;

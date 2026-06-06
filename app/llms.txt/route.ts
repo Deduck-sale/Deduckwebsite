@@ -29,6 +29,13 @@ function formatPackage(p: Package): string {
   lines.push("");
   lines.push(`**ราคา / Price:** ${p.price.toLocaleString("en-US")} THB`);
   lines.push("");
+  if (p.best_fit) {
+    lines.push(`**เหมาะกับ:** ${p.best_fit}`);
+    if (p.best_fit_en && p.best_fit_en !== p.best_fit) {
+      lines.push(`**Best for:** ${p.best_fit_en}`);
+    }
+    lines.push("");
+  }
   if (p.features.length > 0) {
     lines.push("**รายละเอียด / Includes:**");
     p.features.forEach((f) => lines.push(`- ${f}`));

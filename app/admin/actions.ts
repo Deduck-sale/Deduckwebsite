@@ -39,6 +39,8 @@ export async function savePackage(formData: FormData) {
     features_en: splitLines(formData.get("features_en")),
     channels: splitLines(formData.get("channels")),
     channels_en: splitLines(formData.get("channels_en")),
+    best_fit: ((formData.get("best_fit") as string) || "").trim() || null,
+    best_fit_en: ((formData.get("best_fit_en") as string) || "").trim() || null,
     is_recommended: formData.get("is_recommended") === "on",
     sort_order: Number(formData.get("sort_order") || 0),
     is_active: formData.get("is_active") === "on",

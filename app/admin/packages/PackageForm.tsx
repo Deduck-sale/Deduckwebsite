@@ -116,6 +116,27 @@ export default function PackageForm({ pkg }: Props) {
         </Field>
       </div>
 
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Field label="🇹🇭 เหมาะกับใคร / Best fit (TH) — 1 บรรทัดสั้นๆ">
+          <input
+            type="text"
+            name="best_fit"
+            defaultValue={pkg?.best_fit ?? ""}
+            className="form-input"
+            placeholder="เช่น SME ใหม่ ร้านเล็ก ร้านอาหาร คาเฟ่"
+          />
+        </Field>
+        <Field label="🇬🇧 Best fit (EN)">
+          <input
+            type="text"
+            name="best_fit_en"
+            defaultValue={pkg?.best_fit_en ?? ""}
+            className="form-input"
+            placeholder="e.g. New SMEs, small restaurants, cafés"
+          />
+        </Field>
+      </div>
+
       <div className="grid grid-cols-2 gap-4">
         <Field label="ลำดับการแสดง">
           <input

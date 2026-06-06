@@ -15,6 +15,8 @@ create table if not exists public.packages (
   features_en text[] not null default '{}', -- features ภาษาอังกฤษ (optional)
   channels text[] not null default '{}',
   channels_en text[] not null default '{}',
+  best_fit text,                            -- "เหมาะกับใคร" บรรทัดเดียว
+  best_fit_en text,                         -- English version (optional)
   is_recommended boolean not null default false,
   sort_order integer not null default 0,
   is_active boolean not null default true,
