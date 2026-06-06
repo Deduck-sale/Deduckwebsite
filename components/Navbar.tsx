@@ -5,15 +5,21 @@ import { useTranslation } from "@/lib/i18n/LanguageContext";
 import LanguageToggle from "./LanguageToggle";
 
 export default function Navbar() {
-  const { t } = useTranslation();
+  const { t, locale, pathFor } = useTranslation();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
+  // Anchors live on the home page. When the visitor is currently on /en or
+  // a /services/* page, hash links still need to point at the home page
+  // (TH or EN equivalent), not at the current path.
+  const home = pathFor(locale);
+  const homeBase = home === "/" ? "" : home;
   const links = [
-    { href: "#home", label: t.nav.home },
-    { href: "#services", label: t.nav.services },
-    { href: "#portfolio", label: t.nav.portfolio },
-    { href: "#pricing", label: t.nav.pricing },
+    { href: `${homeBase}#home`, label: t.nav.home },
+    { href: `${homeBase}#services`, label: t.nav.services },
+    { href: `${homeBase}#portfolio`, label: t.nav.portfolio },
+    { href: `${homeBase}#pricing`, label: t.nav.pricing },
+    { href: `${homeBase}#faq`, label: t.nav.faq },
   ];
 
   useEffect(() => {
@@ -64,7 +70,7 @@ export default function Navbar() {
               </a>
             ))}
             <a
-              href="#contact"
+              href={`${homeBase}#contact`}
               className="px-5 py-2 bg-deduck-yellow text-deduck-dark font-bold rounded-full hover:bg-yellow-400 transition transform hover:scale-105 shadow-[0_0_15px_rgba(255,208,0,0.3)]"
             >
               {t.nav.contact}
@@ -110,7 +116,7 @@ export default function Navbar() {
               </a>
             ))}
             <a
-              href="#contact"
+              href={`${homeBase}#contact`}
               onClick={() => setOpen(false)}
               className="block px-3 py-2 mt-4 text-base font-bold text-deduck-dark bg-deduck-yellow rounded-md text-center"
             >

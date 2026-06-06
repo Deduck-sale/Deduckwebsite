@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useTranslation } from "@/lib/i18n/LanguageContext";
 
 const ICON_PATHS = {
@@ -30,23 +31,32 @@ const ICON_PATHS = {
 } as const;
 
 export default function Services() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
+  const prefix = locale === "en" ? "/en" : "";
 
-  const services: { key: keyof typeof ICON_PATHS; title: string; desc: string }[] = [
+  const services: {
+    key: keyof typeof ICON_PATHS;
+    title: string;
+    desc: string;
+    href: string;
+  }[] = [
     {
       key: "social",
       title: t.services.items.social.title,
       desc: t.services.items.social.desc,
+      href: `${prefix}/services/social-media`,
     },
     {
       key: "production",
       title: t.services.items.production.title,
       desc: t.services.items.production.desc,
+      href: `${prefix}/services/production`,
     },
     {
       key: "branding",
       title: t.services.items.branding.title,
       desc: t.services.items.branding.desc,
+      href: `${prefix}/services/branding`,
     },
   ];
 
@@ -67,8 +77,9 @@ export default function Services() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {services.map((s) => (
-            <div
+            <Link
               key={s.key}
+              href={s.href}
               className="glass-card p-10 flex flex-col items-center text-center group"
             >
               <div className="w-20 h-20 glass-panel flex items-center justify-center mb-6 group-hover:scale-110 group-hover:border-deduck-yellow/50 transition duration-500 shadow-[0_0_15px_rgba(255,255,255,0.05)]">
@@ -84,10 +95,13 @@ export default function Services() {
               <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-deduck-yellow transition duration-300">
                 {s.title}
               </h3>
-              <p className="text-gray-300 leading-relaxed font-light">
+              <p className="text-gray-300 leading-relaxed font-light flex-1">
                 {s.desc}
               </p>
-            </div>
+              <span className="mt-6 text-deduck-yellow text-sm font-medium opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0 transition duration-300">
+                {s.title} →
+              </span>
+            </Link>
           ))}
         </div>
       </div>

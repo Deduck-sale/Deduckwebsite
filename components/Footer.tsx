@@ -80,6 +80,23 @@ export default function Footer() {
                 </div>
                 @deduck_agency
               </a>
+              <a
+                href="https://line.me/R/ti/p/@deduck.agency"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center text-gray-300 hover:text-deduck-yellow transition group"
+              >
+                <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mr-3 group-hover:bg-[#00B900]/20 group-hover:border-[#00B900]/50 transition text-[#00B900]">
+                  <svg
+                    className="w-4 h-4"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M24 10.304c0-5.369-5.383-9.738-12-9.738-6.616 0-12 4.369-12 9.738 0 4.814 3.963 8.898 9.422 9.605.385.083.91.254 1.042.593.118.303.038.777-.035 1.096-.089.387-.43 1.693-.526 2.05-.118.441-.184.887.26 1.066.445.179.914-.067 1.258-.293.435-.286 4.908-2.902 7.158-5.289 2.213-2.333 3.421-5.186 3.421-8.826z" />
+                  </svg>
+                </div>
+                @deduck.agency
+              </a>
             </div>
           </div>
         </div>
