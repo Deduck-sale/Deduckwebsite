@@ -12,7 +12,7 @@ const prompt = Prompt({
 });
 
 const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://deduck.th";
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://deduckwebsite.vercel.app";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -40,6 +40,16 @@ export const metadata: Metadata = {
   publisher: "Deduck Agency Co.,Ltd.",
   alternates: {
     canonical: "/",
+    languages: {
+      "th-TH": "/",
+      "en-US": "/",
+      "x-default": "/",
+    },
+  },
+  other: {
+    // Hint AI crawlers (Anthropic, OpenAI, Perplexity, Google AI Overviews,
+    // etc.) that we have a curated plain-text summary at /llms.txt.
+    "llms-txt": `${SITE_URL}/llms.txt`,
   },
   openGraph: {
     title: "De Duck Agency | Digital Marketing Agency",
