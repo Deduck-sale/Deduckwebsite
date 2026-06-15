@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import type { PortfolioCategory } from "@/lib/supabase/types";
+import { translateArray, translateText } from "@/lib/translate";
 
 async function requireAuth() {
   const supabase = await createClient();
@@ -61,6 +62,33 @@ export async function deletePackage(id: string) {
   const { error } = await supabase.from("packages").delete().eq("id", id);
   if (error) throw error;
   revalidateHome();
+}
+
+/**
+ * Translate the Thai fields of a package draft into English and return
+ * the result. The form-level "🪄 Auto-translate" button calls this and
+ * fills the EN inputs with whatever comes back. No DB write happens
+ * here — the admin still saves manually after reviewing.
+ */
+export async function autoTranslatePackage(input: {
+  name: string;
+  features: string[];
+  channels: string[];
+  best_fit: string;
+}): Promise<{
+  name_en: string;
+  features_en: string[];
+  channels_en: string[];
+  best_fit_en: string;
+}> {
+  await requireAuth();
+  const [name_en, features_en, channels_en, best_fit_en] = await Promise.all([
+    translateText(input.name),
+    translateArray(input.features),
+    translateArray(input.channels),
+    translateText(input.best_fit),
+  ]);
+  return { name_en, features_en, channels_en, best_fit_en };
 }
 
 // ---------- Portfolio ----------

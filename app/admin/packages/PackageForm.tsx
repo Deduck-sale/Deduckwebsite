@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import type { Package } from "@/lib/supabase/types";
-import { savePackage } from "../actions";
+import { autoTranslatePackage, savePackage } from "../actions";
 
 interface Props {
   pkg?: Package;
@@ -12,7 +12,54 @@ interface Props {
 export default function PackageForm({ pkg }: Props) {
   const router = useRouter();
   const [pending, start] = useTransition();
+  const [translating, setTranslating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // TH fields stay uncontrolled (defaultValue) for snappy typing.
+  // EN fields are controlled state because the "🪄 auto-translate"
+  // button writes into them programmatically.
+  const [nameEn, setNameEn] = useState(pkg?.name_en ?? "");
+  const [featuresEn, setFeaturesEn] = useState(
+    pkg?.features_en?.join("\n") ?? ""
+  );
+  const [channelsEn, setChannelsEn] = useState(
+    pkg?.channels_en?.join("\n") ?? ""
+  );
+  const [bestFitEn, setBestFitEn] = useState(pkg?.best_fit_en ?? "");
+
+  async function handleAutoTranslate(e: React.MouseEvent<HTMLButtonElement>) {
+    const form = e.currentTarget.closest("form") as HTMLFormElement | null;
+    if (!form) return;
+    setTranslating(true);
+    setError(null);
+    try {
+      const data = new FormData(form);
+      const splitLines = (v: FormDataEntryValue | null) =>
+        ((v as string) || "")
+          .split("\n")
+          .map((s) => s.trim())
+          .filter(Boolean);
+
+      const result = await autoTranslatePackage({
+        name: (data.get("name") as string) || "",
+        features: splitLines(data.get("features")),
+        channels: splitLines(data.get("channels")),
+        best_fit: (data.get("best_fit") as string) || "",
+      });
+
+      setNameEn(result.name_en);
+      setFeaturesEn(result.features_en.join("\n"));
+      setChannelsEn(result.channels_en.join("\n"));
+      setBestFitEn(result.best_fit_en);
+    } catch (err) {
+      setError(
+        "แปลภาษาไม่สำเร็จ: " +
+          (err instanceof Error ? err.message : String(err))
+      );
+    } finally {
+      setTranslating(false);
+    }
+  }
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -45,6 +92,27 @@ export default function PackageForm({ pkg }: Props) {
         </select>
       </Field>
 
+      {/* Auto-translate banner */}
+      <div className="flex items-center justify-between gap-4 p-4 rounded-xl bg-deduck-yellow/10 border border-deduck-yellow/30">
+        <div>
+          <p className="text-deduck-yellow text-sm font-bold mb-1">
+            🪄 แปลภาษาอัตโนมัติ
+          </p>
+          <p className="text-gray-400 text-xs leading-relaxed">
+            กรอกฝั่ง 🇹🇭 ไทยก่อน → กดปุ่ม จะแปลฟิลด์ทั้งหมดเป็น EN ให้
+            (แก้ได้ก่อนบันทึก)
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={handleAutoTranslate}
+          disabled={translating}
+          className="shrink-0 px-4 py-2 bg-deduck-yellow text-deduck-dark font-bold rounded-lg hover:bg-yellow-400 transition disabled:opacity-50 text-sm"
+        >
+          {translating ? "กำลังแปล..." : "🪄 แปล TH → EN"}
+        </button>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Field label="🇹🇭 ชื่อ Package (TH)">
           <input
@@ -60,7 +128,8 @@ export default function PackageForm({ pkg }: Props) {
           <input
             type="text"
             name="name_en"
-            defaultValue={pkg?.name_en ?? ""}
+            value={nameEn}
+            onChange={(e) => setNameEn(e.target.value)}
             className="form-input"
             placeholder="e.g. Marketing Standard"
           />
@@ -90,7 +159,8 @@ export default function PackageForm({ pkg }: Props) {
         <Field label="🇬🇧 What's included (EN) — บรรทัดใหม่ = 1 ข้อ">
           <textarea
             name="features_en"
-            defaultValue={pkg?.features_en?.join("\n") ?? ""}
+            value={featuresEn}
+            onChange={(e) => setFeaturesEn(e.target.value)}
             className="form-input min-h-[140px]"
             placeholder={"4 Video Clips + Caption\n10 Social Media Posts\n..."}
           />
@@ -109,7 +179,8 @@ export default function PackageForm({ pkg }: Props) {
         <Field label="🇬🇧 Channels covered (EN) — บรรทัดใหม่ = 1 ข้อ">
           <textarea
             name="channels_en"
-            defaultValue={pkg?.channels_en?.join("\n") ?? ""}
+            value={channelsEn}
+            onChange={(e) => setChannelsEn(e.target.value)}
             className="form-input min-h-[80px]"
             placeholder={"Facebook, IG, Tiktok\nAds management"}
           />
@@ -130,7 +201,8 @@ export default function PackageForm({ pkg }: Props) {
           <input
             type="text"
             name="best_fit_en"
-            defaultValue={pkg?.best_fit_en ?? ""}
+            value={bestFitEn}
+            onChange={(e) => setBestFitEn(e.target.value)}
             className="form-input"
             placeholder="e.g. New SMEs, small restaurants, cafés"
           />
@@ -179,7 +251,7 @@ export default function PackageForm({ pkg }: Props) {
       <div className="flex gap-3 pt-2">
         <button
           type="submit"
-          disabled={pending}
+          disabled={pending || translating}
           className="px-6 py-3 bg-deduck-yellow text-deduck-dark font-bold rounded-lg hover:bg-yellow-400 transition disabled:opacity-50"
         >
           {pending ? "กำลังบันทึก..." : "บันทึก"}
